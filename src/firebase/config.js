@@ -4,12 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyC_AaAhBt0d-mAnQHYGFod39XlxdlJ38Bw",
+  authDomain: "modz-mafia.firebaseapp.com",
+  projectId: "modz-mafia",
+  storageBucket: "modz-mafia.firebasestorage.app",
+  messagingSenderId: "40949260451",
+  appId: "1:40949260451:web:eb5843d1a955c0a3b11f16",
+  measurementId: "G-Y27QJHJR97"
 };
 
 // Initialize Firebase
