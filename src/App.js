@@ -1,165 +1,124 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
 import './index.css';
 
-// Components Import
+// Components & Pages
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import AppCard from './components/AppCard';
 import PromptCard from './components/PromptCard';
 import Details from './pages/Details';
+import { Send, Bot, X, Home as HomeIcon, Gamepad2, Flame, Search, Star } from 'lucide-react';
 
-// Icons Import
-import { Send, Bot, X, Home as HomeIcon, Gamepad2, Flame, Search } from 'lucide-react';
+// --- মক ডেটা (সার্চিং এর জন্য) ---
+const allContent = [
+  { id: 'capcut-pro', name: 'CapCut Pro', type: 'app', rating: 5, downloads: '13.7K', icon: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Capcut-logo.png' },
+  { id: 'moviebox-pro', name: 'MovieBox Pro', type: 'app', rating: 4, downloads: '12K', icon: 'https://www.movieboxpro.app/img/logo.png' },
+  { id: 'dslr-preset', name: 'DSLR Cinematic', type: 'preset', rating: 5, downloads: '113+', icon: 'https://via.placeholder.com/300' },
+  { id: 'ai-prompt-1', name: 'AI Prompt 1', type: 'prompt', rating: 5, downloads: '7+', icon: 'https://via.placeholder.com/150' },
+];
 
-// --- Home Component (হোম পেজের ডিজাইন) ---
-const Home = () => {
+const Home = ({ searchQuery, setSearchQuery }) => {
+  const filteredData = allContent.filter(item => 
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="p-4 pb-28 animate-in fade-in duration-500">
-      {/* Search Bar Section */}
+    <div className="p-4 pb-28 min-h-screen">
+      {/* Search Bar */}
       <div className="relative mt-2">
         <input 
           type="text" 
-          placeholder="Search...." 
-          className="w-full bg-cardBg border border-borderGray rounded-2xl py-4 px-5 focus:outline-none focus:border-primary text-gray-300 shadow-xl transition-all"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search Apps, Presets, Prompts..." 
+          className="w-full bg-cardBg border border-borderGray rounded-2xl py-4 px-5 focus:border-primary text-gray-300 outline-none" 
         />
         <div className="absolute right-5 top-4 text-primary">
-          <Search size={22} strokeWidth={2.5} />
+          <Search size={22} />
         </div>
       </div>
 
-      {/* Hero Banner */}
-      <div className="mt-6 bg-gradient-to-r from-blue-700 via-indigo-600 to-primary p-4 rounded-3xl flex items-center gap-3 shadow-lg relative overflow-hidden">
-        <div className="bg-white/20 p-2 rounded-xl z-10">
-          <Send size={24} className="text-white" />
+      {searchQuery ? (
+        <div className="mt-8">
+          <h2 className="text-lg font-bold mb-4">Search Results ({filteredData.length})</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {filteredData.map(item => (
+              <Link key={item.id} to={`/details/${item.id}`}>
+                <AppCard name={item.name} rating={item.rating} downloads={item.downloads} icon={item.icon} />
+              </Link>
+            ))}
+          </div>
         </div>
-        <span className="text-sm font-bold text-white z-10">সবগুলো প্রিমিয়াম Apps একদম ফ্রি! 🚀</span>
-        {/* Banner Decorative Circle */}
-        <div className="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full"></div>
-      </div>
+      ) : (
+        <>
+          {/* Default Home Sections (আগের মতই) */}
+          <div className="mt-6 bg-gradient-to-r from-blue-700 to-primary p-4 rounded-3xl flex items-center gap-3">
+            <Send size={24} className="text-white" />
+            <span className="text-sm font-bold">Modz Mafia - সব প্রিমিয়াম Apps ফ্রি! 🚀</span>
+          </div>
 
-      {/* AI Prompt Section (Horizontal Scroll) */}
-      <div className="mt-8">
-        <div className="flex items-center gap-2 mb-4 text-primary">
-          <Bot size={24} />
-          <h2 className="text-lg font-bold text-white tracking-tight">AI Prompt (35)</h2>
-        </div>
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-          <Link to="/details/prompt-1">
-            <PromptCard title="Prompt 👆" image="https://img.freepik.com/free-photo/portrait-fashionable-man_23-2148860955.jpg" />
-          </Link>
-          <Link to="/details/prompt-2">
-            <PromptCard title="Prompt 👆" image="https://img.freepik.com/free-photo/fashion-man-portrait_23-2148860882.jpg" />
-          </Link>
-          <Link to="/details/prompt-3">
-            <PromptCard title="Prompt 👆" image="https://img.freepik.com/free-photo/cool-man-posing-outdoors_23-2148850982.jpg" />
-          </Link>
-        </div>
-      </div>
-
-      {/* Trending Apps Section */}
-      <div className="mt-8">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-6 bg-primary rounded-full"></div>
-          <h2 className="text-lg font-bold">Trending Apps (3)</h2>
-        </div>
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-          <Link to="/details/capcut-pro">
-            <AppCard name="CapCut Pro" rating={5} downloads="13.7K" icon="https://upload.wikimedia.org/wikipedia/commons/0/0e/Capcut-logo.png" />
-          </Link>
-          <Link to="/details/moviebox-pro">
-            <AppCard name="MovieBox Pro" rating={4} downloads="12.0K" icon="https://www.movieboxpro.app/img/logo.png" />
-          </Link>
-          <Link to="/details/youtube-pro">
-            <AppCard name="YouTube Pro" rating={5} downloads="1.1K" icon="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" />
-          </Link>
-        </div>
-      </div>
-
-      {/* Latest Updates Section (Grid Layout) */}
-      <div className="mt-8">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
-          <h2 className="text-lg font-bold">Latest Updates (101)</h2>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          <Link to="/details/sportzfy"><AppCard name="Sportzfy" rating={5} downloads="v6" icon="https://via.placeholder.com/100" /></Link>
-          <Link to="/details/picsart"><AppCard name="PicsArt Pro" rating={5} downloads="v16.0" icon="https://via.placeholder.com/100" /></Link>
-          <Link to="/details/tiktok"><AppCard name="TikTok Pro" rating={4} downloads="v10.0" icon="https://via.placeholder.com/100" /></Link>
-        </div>
-      </div>
+          <div className="mt-8">
+             <div className="flex items-center gap-2 mb-4 text-primary"><Bot size={24}/><h2 className="text-lg font-bold text-white">AI Prompt</h2></div>
+             <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {allContent.filter(i => i.type === 'prompt').map(item => (
+                  <Link key={item.id} to={`/details/${item.id}`}><PromptCard title={item.name} image={item.icon} /></Link>
+                ))}
+             </div>
+          </div>
+          
+          <div className="mt-8">
+             <div className="flex items-center gap-2 mb-4"><div className="w-2 h-6 bg-primary rounded-full"></div><h2 className="text-lg font-bold">Trending Apps</h2></div>
+             <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {allContent.filter(i => i.type === 'app').map(item => (
+                  <Link key={item.id} to={`/details/${item.id}`}><AppCard name={item.name} rating={item.rating} downloads={item.downloads} icon={item.icon} /></Link>
+                ))}
+             </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-// --- Main App Component ---
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleTheme = () => setIsDark(!isDark);
+  // মেনু আইটেম হাইলাইট করার জন্য স্টাইল
+  const activeLink = "flex items-center gap-4 text-primary bg-primary/10 p-3 rounded-2xl";
+  const normalLink = "flex items-center gap-4 p-3 hover:bg-cardBg rounded-2xl transition-all text-gray-400";
 
   return (
     <Router>
-      <div className={isDark ? "dark" : ""}>
-        <div className="min-h-screen bg-darkBg text-white relative overflow-x-hidden selection:bg-primary selection:text-black">
+      <div className={isDark ? "dark" : "light"}>
+        <div className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-darkBg text-white" : "bg-gray-100 text-black"} relative overflow-x-hidden`}>
           
-          {/* Navbar */}
-          <Navbar toggleMenu={toggleMenu} isDark={isDark} toggleTheme={toggleTheme} />
+          <Navbar toggleMenu={() => setIsMenuOpen(true)} isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />
 
-          {/* --- Sidebar Menu Drawer (স্ক্রিনশটের মতো মেনু) --- */}
-          <div 
-            className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
-            onClick={toggleMenu}
-          ></div>
+          {/* সাইড মেনু ড্রয়ার (ভিডিওর মতো হুবহু ডিজাইন) */}
+          <div className={`fixed inset-0 z-[60] bg-black/60 transition-opacity ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} onClick={() => setIsMenuOpen(false)}></div>
           
-          <div className={`fixed inset-y-0 right-0 w-72 bg-[#161b29] z-[70] transform ${isMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-500 ease-in-out border-l border-borderGray shadow-2xl p-6`}>
-            <div className="flex justify-between items-center mb-10">
-              <div className="flex items-center gap-2">
-                <div className="bg-primary rounded-full p-1 w-6 h-6 flex items-center justify-center font-bold text-black text-xs">M</div>
-                <span className="font-bold text-gray-400">ModzMafia.top</span>
-              </div>
-              <button onClick={toggleMenu} className="p-2 bg-darkBg rounded-full text-gray-400 border border-borderGray">
-                <X size={20}/>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-5 font-bold text-lg">
-              <Link to="/" onClick={toggleMenu} className="flex items-center gap-4 text-primary bg-primary/10 p-3 rounded-2xl">
-                <HomeIcon size={22}/> Home
-              </Link>
-              <Link to="/apps" onClick={toggleMenu} className="flex items-center gap-4 p-3 hover:bg-cardBg rounded-2xl transition-all">
-                <Gamepad2 size={22} className="text-green-500"/> Apps
-              </Link>
-              <Link to="/presets" onClick={toggleMenu} className="flex items-center gap-4 p-3 hover:bg-cardBg rounded-2xl transition-all">
-                <Flame size={22} className="text-red-500"/> Preset
-              </Link>
-              <Link to="/prompts" onClick={toggleMenu} className="flex items-center gap-4 p-3 hover:bg-cardBg rounded-2xl transition-all">
-                <Bot size={22} className="text-blue-500"/> AI Prompt
-              </Link>
-              <hr className="border-borderGray my-2" />
-              <Link to="#" className="flex items-center gap-4 p-3 text-blue-400">
-                <Send size={22}/> Join Telegram
-              </Link>
-            </div>
-            
-            <div className="absolute bottom-10 left-0 right-0 text-center text-gray-600 text-[10px] font-bold tracking-widest uppercase">
-              © Modz Mafia 2026
-            </div>
+          <div className={`fixed inset-y-0 right-0 w-64 ${isDark ? "bg-[#161b29]" : "bg-white"} z-[70] transform ${isMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 border-l border-borderGray p-6 shadow-2xl`}>
+             <button onClick={() => setIsMenuOpen(false)} className="absolute top-4 right-4 p-2 bg-darkBg rounded-full text-white"><X size={20}/></button>
+             
+             <div className="mt-12 flex flex-col gap-4 font-bold">
+                <NavLink to="/" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><HomeIcon size={20}/> Home</NavLink>
+                <NavLink to="/apps" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><Gamepad2 size={20}/> Apps</NavLink>
+                <NavLink to="/presets" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><Flame size={20}/> Preset</NavLink>
+                <NavLink to="/prompts" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><Bot size={20}/> AI Prompt</NavLink>
+                <hr className="border-borderGray my-2" />
+                <a href="https://t.me/ModzMafia" target="_blank" className="flex items-center gap-4 p-3 text-blue-400 font-bold"><Send size={20}/> Join Telegram</a>
+             </div>
           </div>
 
-          {/* Main Routing Content */}
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
             <Route path="/details/:id" element={<Details />} />
-            <Route path="/apps" element={<div className="p-10 text-center">Apps Collection coming soon...</div>} />
-            <Route path="/presets" element={<div className="p-10 text-center">Presets coming soon...</div>} />
-            <Route path="/prompts" element={<div className="p-10 text-center">AI Prompts coming soon...</div>} />
           </Routes>
 
-          {/* Footer & Bottom Navigation */}
           <Footer />
           <BottomNav />
         </div>
