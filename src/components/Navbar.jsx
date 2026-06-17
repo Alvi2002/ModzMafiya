@@ -4,17 +4,16 @@ import { Search, Settings, Send, Menu } from 'lucide-react';
 const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-darkBg border-b border-borderGray px-4 py-3 flex items-center justify-between">
-      {/* লোগো */}
       <div className="flex items-center gap-2">
-        <div className="bg-red-500 rounded-full p-1 w-8 h-8 flex items-center justify-center font-bold text-white text-xl">
-          P
+        {/* Modz Mafia Logo */}
+        <div className="bg-primary rounded-full p-1 w-8 h-8 flex items-center justify-center font-bold text-black text-xl">
+          M
         </div>
-        <h1 className="text-xl font-bold tracking-tight">
-          Poloja <span className="text-primary">.top</span>
+        <h1 className="text-xl font-bold tracking-tight text-white">
+          Modz <span className="text-primary">Mafia</span>
         </h1>
       </div>
 
-      {/* সেটিং ও মেনু আইকন */}
       <div className="flex items-center gap-3">
         <button className="p-2 bg-cardBg rounded-full border border-borderGray">
           <Settings size={20} className="text-gray-400" />
