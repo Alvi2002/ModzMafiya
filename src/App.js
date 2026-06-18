@@ -16,51 +16,52 @@ import { Send, Bot, X, Home as HomeIcon, Gamepad2, Flame, Search } from 'lucide-
 
 const Home = ({ searchQuery, setSearchQuery }) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const q = query(collection(db, "content"), orderBy("createdAt", "desc"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        setData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } catch (error) {
-      console.error("Firebase Error:", error);
-      setLoading(false);
-    }
+    const q = query(collection(db, "content"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
   }, []);
 
-  const filtered = data.filter(i => i.name && i.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
-  if (loading) return <div className="flex justify-center items-center h-64 text-primary font-bold">Loading Modz Mafia...</div>;
+  // ইউনিফাইড সার্চ (সব ক্যাটাগরি একসাথে দেখাবে)
+  const filtered = data.filter(i => i.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="p-4 pb-28">
       <div className="relative mt-2">
-        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Apps, Presets, Prompts..." className="w-full bg-[#161b29] border border-[#242936] rounded-2xl py-4 px-5 focus:border-[#00df82] text-gray-300 outline-none" />
-        <Search className="absolute right-5 top-4 text-[#00df82]" />
+        <input 
+          type="text" 
+          value={searchQuery} 
+          onChange={(e) => setSearchQuery(e.target.value)} 
+          placeholder="Search Apps, Presets, Prompts..." 
+          className="w-full bg-cardBg border border-borderGray rounded-2xl py-4 px-5 focus:border-primary text-gray-300 outline-none" 
+        />
+        <Search className="absolute right-5 top-4 text-primary" />
       </div>
 
       {searchQuery ? (
-        <div className="mt-8 grid grid-cols-2 gap-4">
-          {filtered.map(item => (
-            <Link key={item.id} to={`/details/${item.id}`}>
-              <AppCard name={item.name} rating={item.rating} downloads={item.size} icon={item.imageUrl} />
-            </Link>
-          ))}
+        <div className="mt-8">
+          <h2 className="text-lg font-bold mb-4">Results for "{searchQuery}"</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {filtered.map(item => (
+              <Link key={item.id} to={`/details/${item.id}`}>
+                <AppCard name={item.name} rating={item.rating} downloads={item.size} icon={item.imageUrl} />
+              </Link>
+            ))}
+          </div>
         </div>
       ) : (
         <>
-          <div className="mt-6 bg-gradient-to-r from-blue-700 to-[#00df82] p-4 rounded-3xl flex items-center gap-3">
+          <div className="mt-6 bg-gradient-to-r from-blue-700 to-primary p-4 rounded-3xl flex items-center gap-3">
             <Send size={24} className="text-white" />
             <span className="text-sm font-bold">Modz Mafia - সব প্রিমিয়াম Apps ফ্রি! 🚀</span>
           </div>
 
           {/* AI Prompt Section */}
           <div className="mt-8">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><Bot className="text-[#00df82]"/> AI Prompt</h2>
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><Bot className="text-primary"/> AI Prompt</h2>
             <div className="flex gap-4 overflow-x-auto no-scrollbar">
               {data.filter(i => i.type === 'prompt').map(item => (
                 <Link key={item.id} to={`/details/${item.id}`}><PromptCard title={item.name} image={item.imageUrl} /></Link>
@@ -70,7 +71,7 @@ const Home = ({ searchQuery, setSearchQuery }) => {
 
           {/* Trending Apps Section */}
           <div className="mt-8">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><div className="w-2 h-6 bg-[#00df82] rounded-full"></div> Trending Apps</h2>
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><div className="w-2 h-6 bg-primary rounded-full"></div> Trending Apps</h2>
             <div className="flex gap-4 overflow-x-auto no-scrollbar">
               {data.filter(i => i.type === 'app').map(item => (
                 <Link key={item.id} to={`/details/${item.id}`}><AppCard name={item.name} rating={item.rating} downloads={item.size} icon={item.imageUrl} /></Link>
@@ -88,19 +89,20 @@ function App() {
   const [isDark, setIsDark] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const activeLink = "flex items-center gap-4 text-[#00df82] bg-[#00df82]/10 p-3 rounded-2xl";
-  const normalLink = "flex items-center gap-4 p-3 hover:bg-[#161b29] rounded-2xl transition-all text-gray-400";
+  // হাইলাইট স্টাইল
+  const activeLink = "flex items-center gap-4 text-primary bg-primary/10 p-3 rounded-2xl border border-primary/20 transition-all";
+  const normalLink = "flex items-center gap-4 p-3 hover:bg-cardBg rounded-2xl transition-all text-gray-400";
 
   return (
     <Router>
-      <div className={isDark ? "dark" : "light"}>
-        <div className={`min-h-screen transition-all ${isDark ? "bg-[#0b0f1a] text-white" : "bg-gray-100 text-black"}`}>
+      <div className={isDark ? "dark" : "light-mode"}>
+        <div className={`min-h-screen ${isDark ? "bg-darkBg text-white" : "bg-gray-100 text-black"} transition-colors duration-300`}>
           <Navbar toggleMenu={() => setIsMenuOpen(true)} isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />
           
-          {/* Side Menu */}
+          {/* Sidebar Menu Drawer (ভিডিওর মতো স্লিমি ডিজাইন) */}
           <div className={`fixed inset-0 z-[60] bg-black/60 transition-opacity ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} onClick={() => setIsMenuOpen(false)}></div>
-          <div className={`fixed inset-y-0 right-0 w-64 ${isDark ? "bg-[#161b29]" : "bg-white"} z-[70] transform ${isMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 border-l border-[#242936] p-6`}>
-             <button onClick={() => setIsMenuOpen(false)} className="mb-8 p-2 bg-[#0b0f1a] rounded-full text-white"><X size={20}/></button>
+          <div className={`fixed inset-y-0 right-0 w-64 ${isDark ? "bg-[#161b29]" : "bg-white"} z-[70] transform ${isMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 border-l border-borderGray p-6 shadow-2xl`}>
+             <button onClick={() => setIsMenuOpen(false)} className="mb-10 p-2 bg-darkBg rounded-full text-white border border-borderGray"><X size={20}/></button>
              <div className="flex flex-col gap-4 font-bold">
                 <NavLink to="/" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><HomeIcon size={20}/> Home</NavLink>
                 <NavLink to="/apps" onClick={() => setIsMenuOpen(false)} className={({isActive}) => isActive ? activeLink : normalLink}><Gamepad2 size={20}/> Apps</NavLink>
